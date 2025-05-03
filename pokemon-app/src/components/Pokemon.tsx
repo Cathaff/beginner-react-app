@@ -16,42 +16,42 @@ function PokemonApp() {
     const [pokemon, setPokemon] = useState<Pokemon | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null> (null);
+    const [submittedName, setSubmittedName] =  useState<string>("");
 
+
+    const fetchPokemon = async (name: string) => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
+
+            if(!response.ok) {
+                throw new Error("Pokemon not found")
+            }
+            
+            const data: Pokemon = await response.json();
+            console.log(data)
+            setPokemon(data);
+        } catch(err) {
+            setError((err as Error).message);
+            setPokemon(null);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
+        if (!submittedName.trim()) return;
 
-        if (!pokemonName.trim()) return;
-
-        const fetchPokemon = async () => {
-            setLoading(true);
-            setError(null);
-
-            try {
-                const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
-
-                if(!response.ok) {
-                    throw new Error("Pokemon not found")
-                }
-                
-                const data: Pokemon = await response.json();
-                console.log(data)
-                setPokemon(data);
-            } catch(err) {
-                setError((err as Error).message);
-                setPokemon(null);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchPokemon();
-    }, [pokemonName]);
+        fetchPokemon(submittedName);
+    }, [submittedName]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         if (pokemonName.trim()) {
-            setPokemonName(pokemonName.trim());
+            setSubmittedName(pokemonName.trim())
         }
     }
 
